@@ -1746,7 +1746,7 @@ checksum = "4d564e6b39895dbd5f8d6fb1e65e459833478f0b98f12a47e8474a6a21a86f1c"
 
 [[package]]
 name = "gmod-wstool"
-version = "0.2.4"
+version = "0.3.0"
 dependencies = [
  "arc-swap",
  "atomic_enum",
