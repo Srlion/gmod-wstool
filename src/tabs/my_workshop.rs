@@ -275,35 +275,38 @@ impl WorkshopPanel {
 
         if let Some(Ok(r)) = data.as_deref() {
             ui.add_space(8.0);
-            let controls_w = 320.0;
-            let x_off = ((ui.available_width() - controls_w) * 0.5).max(0.0);
+            let prev_w = ui
+                .ctx()
+                .data(|d| d.get_temp::<f32>(egui::Id::new("pager_w")).unwrap_or(0.0));
+            let x_off = ((ui.available_width() - prev_w) * 0.5).max(0.0);
             ui.horizontal(|ui| {
                 ui.add_space(x_off);
-                ui.allocate_ui(egui::Vec2::new(controls_w, 32.0), |ui| {
-                    ui.horizontal(|ui| {
-                        if ui
-                            .add_enabled(self.page > 1 && !loading, egui::Button::new("<  Prev"))
-                            .clicked()
-                        {
-                            self.page -= 1;
-                            self.loader.reset(self.page);
-                        }
-                        ui.label(
-                            RichText::new(format!("Page {} of {}", self.page, r.total_pages))
-                                .weak(),
-                        );
-                        if ui
-                            .add_enabled(
-                                self.page < r.total_pages && !loading,
-                                egui::Button::new("Next  >"),
-                            )
-                            .clicked()
-                        {
-                            self.page += 1;
-                            self.loader.reset(self.page);
-                        }
+                let start = ui.cursor().min.x;
+                if ui
+                    .add_enabled(self.page > 1 && !loading, egui::Button::new("<  Prev"))
+                    .clicked()
+                {
+                    self.page -= 1;
+                    self.loader.reset(self.page);
+                }
+                ui.label(RichText::new(format!("Page {} of {}", self.page, r.total_pages)).weak());
+                if ui
+                    .add_enabled(
+                        self.page < r.total_pages && !loading,
+                        egui::Button::new("Next  >"),
+                    )
+                    .clicked()
+                {
+                    self.page += 1;
+                    self.loader.reset(self.page);
+                }
+                let measured = ui.cursor().min.x - start;
+                if (measured - prev_w).abs() > 0.5 {
+                    ui.ctx().data_mut(|d| {
+                        d.insert_temp(egui::Id::new("pager_w"), measured);
                     });
-                });
+                    ui.ctx().request_repaint();
+                }
             });
         }
         self.show_ignores_modal(ui);
