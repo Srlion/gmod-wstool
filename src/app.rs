@@ -201,7 +201,6 @@ impl App {
     }
 
     fn show_tab_buttons(&mut self, ui: &mut egui::Ui) {
-        ui.add_space((NAV_HEIGHT - 32.0) * 0.5);
         if ui::tab_button(ui, "My Workshop", self.current_tab == Tab::MyWorkshop) {
             self.current_tab = Tab::MyWorkshop;
         }
