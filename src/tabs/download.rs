@@ -70,19 +70,20 @@ impl DownloadPanel {
 
     pub fn show(&mut self, ui: &mut egui::Ui) {
         if let Some(job) = self.pending_collection.as_mut() {
+            let root_id = job.id();
             if let Some(res) = job.poll() {
                 match res {
                     Ok(kids) if !kids.is_empty() => {
                         let kids = kids.clone();
                         self.pending_collection = None;
+                        self.queue_one(root_id);
                         for kid in kids.into_iter().rev() {
                             self.queue_one(kid);
                         }
                     }
                     Ok(_) => {
-                        let id = job.id();
                         self.pending_collection = None;
-                        self.queue_one(id);
+                        self.queue_one(root_id);
                     }
                     Err(e) => {
                         self.error = Some(e.clone());
@@ -94,8 +95,6 @@ impl DownloadPanel {
                     .request_repaint_after(std::time::Duration::from_millis(50));
             }
         }
-
-        self.pump_queue();
 
         let busy = self.pending_collection.is_some()
             || self.downloads.iter().any(|d| {
@@ -222,6 +221,7 @@ impl DownloadPanel {
                 }
             }
         }
+        self.pump_queue();
 
         let mut layout_changed = false;
         for dl in self.downloads.iter_mut() {

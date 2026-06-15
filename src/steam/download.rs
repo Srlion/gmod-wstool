@@ -4,7 +4,7 @@ use cap_std::ambient_authority;
 use cap_std::fs::Dir;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, Receiver};
-use steamworks::{DownloadItemResult, PublishedFileId};
+use steamworks::{DownloadItemResult, FileType, PublishedFileId};
 
 #[derive(Clone)]
 pub enum DownloadState {
@@ -79,6 +79,12 @@ impl DownloadFinishJob {
         Self { rx, done: None }
     }
 
+    pub fn already_done(folder: PathBuf) -> Self {
+        let (tx, rx) = mpsc::channel();
+        let _ = tx.send(FinishResult::Installed(folder));
+        Self { rx, done: None }
+    }
+
     pub fn poll(&mut self) -> Option<&FinishResult> {
         if self.done.is_none() {
             if let Ok(r) = self.rx.try_recv() {
@@ -90,7 +96,19 @@ impl DownloadFinishJob {
 }
 
 pub fn start_download(id: u64) -> Result<DownloadFinishJob, String> {
-    if client().ugc().download_item(PublishedFileId(id), true) {
+    let ugc = client().ugc();
+    let item = PublishedFileId(id);
+
+    let state = ugc.item_state(item);
+    let installed = state.contains(steamworks::ItemState::INSTALLED);
+    let needs_update = state.contains(steamworks::ItemState::NEEDS_UPDATE);
+    if installed && !needs_update {
+        if let Some(info) = ugc.item_install_info(item) {
+            return Ok(DownloadFinishJob::already_done(PathBuf::from(info.folder)));
+        }
+    }
+
+    if ugc.download_item(item, true) {
         Ok(DownloadFinishJob::start(id))
     } else {
         Err("Steam refused the download (item may not exist or isn't accessible)".into())
@@ -313,7 +331,14 @@ impl CollectionResolveJob {
                 query.fetch(move |res| {
                     let result = match res {
                         Ok(r) => {
-                            let kids = r.get_children(0).unwrap_or_default();
+                            let is_collection = r
+                                .get(0)
+                                .is_some_and(|item| matches!(item.file_type, FileType::Collection));
+                            let kids = if is_collection {
+                                r.get_children(0).unwrap_or_default()
+                            } else {
+                                Vec::new()
+                            };
                             Ok(kids.into_iter().map(|c| c.0).collect())
                         }
                         Err(e) => Err(e.to_string()),
