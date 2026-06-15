@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.7](https://github.com/Srlion/gmod-wstool/compare/v0.2.6...v0.2.7) (2026-06-15)
+
+
+### Bug Fixes
+
+* center my workshop bottom buttons ([7fea1cd](https://github.com/Srlion/gmod-wstool/commit/7fea1cd154966575a5e985b53494f2e446f3013d))
+* center nav buttons ([1b47d01](https://github.com/Srlion/gmod-wstool/commit/1b47d0184616fe0a58d6154f4c184b2b7a8823fd))
+* fixes [#22](https://github.com/Srlion/gmod-wstool/issues/22) ([9a7bb5e](https://github.com/Srlion/gmod-wstool/commit/9a7bb5e4bc0bbb2aa33614c779ce9b73311388ab))
+
 ## [0.2.6](https://github.com/Srlion/gmod-wstool/compare/v0.2.5...v0.2.6) (2026-06-03)
 
 
