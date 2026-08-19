@@ -6,10 +6,10 @@ use crate::{
     },
 };
 use eframe::egui::{self, Color32, CornerRadius, RichText, Stroke, Vec2};
+use egui::Align2;
 use egui::scroll_area::ScrollSource;
-use egui_notify::{Anchor, Toasts};
+use egui_toast::{Toast, ToastKind, ToastOptions, Toasts};
 use std::path::PathBuf;
-use std::time::Duration;
 
 const THUMB: f32 = 96.0;
 const ROW_PAD: f32 = 12.0;
@@ -123,15 +123,9 @@ impl WorkshopPanel {
     pub fn new() -> Self {
         Self {
             loader: AsyncLoad::new(query_items),
-            toasts: Toasts::default()
-                .with_anchor(Anchor::BottomRight)
-                .with_margin(egui::vec2(50.0, 50.0))
-                .with_shadow(egui::epaint::Shadow {
-                    offset: [0, 6],
-                    blur: 18,
-                    spread: 0,
-                    color: Color32::from_black_alpha(140),
-                }),
+            toasts: Toasts::new()
+                .anchor(Align2::RIGHT_BOTTOM, (-50.0, -50.0))
+                .direction(egui::Direction::BottomUp),
             page: 1,
             editor: None,
             confirm_leave: false,
@@ -153,21 +147,29 @@ impl WorkshopPanel {
                     let needs = *needs_legal_agreement;
                     self.create_job = None;
                     self.loader.reset(self.page);
-                    self.toasts
-                        .success("Addon created!")
-                        .duration(Some(Duration::from_secs(3)));
+                    self.toasts.add(Toast {
+                        text: "Addon created!".into(),
+                        kind: ToastKind::Success,
+                        options: ToastOptions::default().duration_in_seconds(3.0),
+                        ..Default::default()
+                    });
                     if needs {
-                        self.toasts
-                            .warning(
-                                "Accept the Workshop legal agreement on Steam for it to go live.",
-                            )
-                            .duration(Some(Duration::from_secs(4)));
+                        self.toasts.add(Toast {
+                            text: "Accept the Workshop legal agreement on Steam for it to go live."
+                                .into(),
+                            kind: ToastKind::Warning,
+                            options: ToastOptions::default().duration_in_seconds(4.0),
+                            ..Default::default()
+                        });
                     }
                 }
                 CreateState::Error(e) => {
-                    self.toasts
-                        .error(format!("Failed to create item: {e}"))
-                        .duration(Some(Duration::from_secs(4)));
+                    self.toasts.add(Toast {
+                        text: format!("Failed to create item: {e}").into(),
+                        kind: ToastKind::Error,
+                        options: ToastOptions::default().duration_in_seconds(4.0),
+                        ..Default::default()
+                    });
                     self.create_job = None;
                 }
             }
@@ -175,11 +177,11 @@ impl WorkshopPanel {
 
         if self.editor.is_some() {
             self.show_editor(ui);
-            self.toasts.show(ui.ctx());
+            self.toasts.show(ui);
             return;
         }
         self.show_list(ui);
-        self.toasts.show(ui.ctx());
+        self.toasts.show(ui);
     }
 
     fn show_list(&mut self, ui: &mut egui::Ui) {
@@ -335,13 +337,19 @@ impl WorkshopPanel {
                 e.job = None;
             }
             self.loader.reset(self.page);
-            self.toasts
-                .success("Update submitted!")
-                .duration(Some(Duration::from_secs(3)));
+            self.toasts.add(Toast {
+                text: "Update submitted!".into(),
+                kind: ToastKind::Success,
+                options: ToastOptions::default().duration_in_seconds(3.0),
+                ..Default::default()
+            });
             if needs_legal_agreement {
-                self.toasts
-                    .warning("Accept the Workshop legal agreement on Steam for it to go live.")
-                    .duration(Some(Duration::from_secs(3)));
+                self.toasts.add(Toast {
+                    text: "Accept the Workshop legal agreement on Steam for it to go live.".into(),
+                    kind: ToastKind::Warning,
+                    options: ToastOptions::default().duration_in_seconds(3.0),
+                    ..Default::default()
+                });
             }
         }
         let uploading = matches!(job_state, Some(UpdateState::Uploading));
@@ -472,9 +480,12 @@ impl WorkshopPanel {
             ui.horizontal(|ui| {
                 if ui.button("Save").clicked() {
                     crate::ignores::set(self.ignores_buf.lines().map(|l| l.to_string()).collect());
-                    self.toasts
-                        .success("Ignore list saved")
-                        .duration(Some(Duration::from_secs(2)));
+                    self.toasts.add(Toast {
+                        text: "Ignore list saved".into(),
+                        kind: ToastKind::Success,
+                        options: ToastOptions::default().duration_in_seconds(2.0),
+                        ..Default::default()
+                    });
                     self.show_ignores = false;
                 }
                 if ui.button("Cancel").clicked() {
@@ -1110,9 +1121,12 @@ fn item_row(ui: &mut egui::Ui, item: &WorkshopItem, toasts: &mut Toasts) -> bool
                     }
                     if id_resp.on_hover_text("Click to copy ID").clicked() {
                         ui.ctx().copy_text(item.id.to_string());
-                        toasts
-                            .success("Copied ID!")
-                            .duration(Some(Duration::from_secs(2)));
+                        toasts.add(Toast {
+                            text: "Copied ID!".into(),
+                            kind: ToastKind::Success,
+                            options: ToastOptions::default().duration_in_seconds(2.0),
+                            ..Default::default()
+                        });
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         let url = format!(

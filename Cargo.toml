@@ -8,17 +8,17 @@ description = "A tool for managing Garry's Mod workshop addons"
 license = "MIT"
 
 [dependencies]
-arc-swap = "1.9.1"
+arc-swap = "1.9.2"
 atomic_enum = "0.3.0"
 cap-std = "4.0.2"
-eframe = { version = "0.34.3", features = ["persistence"] }
-egui = "0.34.3"
-egui_extras = { version = "0.34.3", features = ["all_loaders"] }
-egui-notify = "0.22.0"
-egui_virtual_list = "0.10.0"
+eframe = { version = "0.36.1", features = ["persistence"] }
+egui = "0.36.1"
+egui_extras = { version = "0.36.1", features = ["all_loaders"] }
+egui-toast = "0.22.0"
+egui_virtual_list = "0.12.0"
 gma-lite = "0.3.4"
 image = { version = "0.25", features = ["jpeg", "png"] }
-lzma-rust2 = "0.16.3"
+lzma-rust2 = "0.19.0"
 open = "5.3.5"
 rfd = "0.17.2"
 serde_json = "1.0.150"
