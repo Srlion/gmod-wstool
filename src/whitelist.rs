@@ -141,10 +141,10 @@ fn parse_header(src: &str) -> Option<Vec<String>> {
         if code.starts_with("NULL") {
             break;
         }
-        if let (Some(a), Some(b)) = (code.find('"'), code.rfind('"')) {
-            if b > a {
-                out.push(code[a + 1..b].to_string());
-            }
+        if let (Some(a), Some(b)) = (code.find('"'), code.rfind('"'))
+            && b > a
+        {
+            out.push(code[a + 1..b].to_string());
         }
     }
     // the page layout probably changed; don't trust it.

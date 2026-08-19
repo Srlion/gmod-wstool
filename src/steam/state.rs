@@ -5,7 +5,7 @@ use arc_swap::ArcSwap;
 use crate::steam::{callbacks, client};
 
 static STATE: AtomicState = AtomicState::new(State::DISCONNECTED);
-static STATE_MESSAGE: LazyLock<ArcSwap<String>> = LazyLock::new(|| ArcSwap::default());
+static STATE_MESSAGE: LazyLock<ArcSwap<String>> = LazyLock::new(ArcSwap::default);
 
 #[atomic_enum::atomic_enum]
 pub enum State {

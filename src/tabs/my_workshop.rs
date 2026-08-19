@@ -269,10 +269,10 @@ impl WorkshopPanel {
                 });
             });
 
-        if let (Some(idx), Some(Ok(r))) = (clicked, data.as_deref()) {
-            if let Some(item) = r.items.get(idx) {
-                self.editor = Some(Editor::from_item(item, None));
-            }
+        if let (Some(idx), Some(Ok(r))) = (clicked, data.as_deref())
+            && let Some(item) = r.items.get(idx)
+        {
+            self.editor = Some(Editor::from_item(item, None));
         }
 
         if let Some(Ok(r)) = data.as_deref() {
@@ -319,11 +319,11 @@ impl WorkshopPanel {
 
     fn show_editor(&mut self, ui: &mut egui::Ui) {
         let mut job_state: Option<UpdateState> = None;
-        if let Some(e) = self.editor.as_mut() {
-            if let Some(job) = e.job.as_mut() {
-                job_state = Some(job.poll());
-                ui.ctx().request_repaint();
-            }
+        if let Some(e) = self.editor.as_mut()
+            && let Some(job) = e.job.as_mut()
+        {
+            job_state = Some(job.poll());
+            ui.ctx().request_repaint();
         }
         if let Some(UpdateState::Done {
             needs_legal_agreement,
@@ -835,11 +835,10 @@ fn show_preview_modal(ui: &mut egui::Ui, editor: &mut Editor) {
                     let cur = editor.cur.preview_path.trim();
                     if !cur.is_empty() {
                         let p = PathBuf::from(cur);
-                        if let Some(parent) = p.parent() {
-                            if parent.is_dir() {
+                        if let Some(parent) = p.parent()
+                            && parent.is_dir() {
                                 dialog = dialog.set_directory(parent);
                             }
-                        }
                         if let Some(name) = p.file_name() {
                             dialog = dialog
                                 .set_file_name(name.to_string_lossy());

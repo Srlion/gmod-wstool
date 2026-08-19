@@ -78,7 +78,7 @@ pub fn query_items(page: u32) -> Result<WorkshopQueryResult, String> {
 
                 let total = results.total_results();
                 let per_page = results.returned_results().max(1);
-                let total_pages = (total + per_page - 1) / per_page;
+                let total_pages = total.div_ceil(per_page);
 
                 Ok(WorkshopQueryResult {
                     items,

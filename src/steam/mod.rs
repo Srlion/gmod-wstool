@@ -44,7 +44,7 @@ pub fn name_avatar() -> NameAvatar {
             let size = 184;
             ColorImage::from_rgba_unmultiplied([size, size], &pixels)
         })
-        .unwrap_or_else(|| ColorImage::example());
+        .unwrap_or_else(ColorImage::example);
 
     let avatar = ctx().load_texture("steam_avatar", avatar, egui::TextureOptions::LINEAR);
 

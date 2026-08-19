@@ -6,7 +6,7 @@ use crate::steam::download::{
 use crate::steam::items::fetch_title;
 use eframe::egui::{self, Color32, RichText, Vec2};
 use egui_virtual_list::VirtualList;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 const MAX_ACTIVE: usize = 3;
 
@@ -33,7 +33,7 @@ impl Download {
     }
 }
 
-fn scan_items(dest_path: &PathBuf) -> Vec<Download> {
+fn scan_items(dest_path: &Path) -> Vec<Download> {
     download::scan_existing(dest_path)
         .into_iter()
         .map(|id| Download::new(id, download::done_state(dest_path.join(id.to_string()))))
@@ -362,16 +362,14 @@ fn show_item(ui: &mut egui::Ui, dl: &Download, title: Option<&str>) {
                     {
                         let _ = open::that(&url);
                     }
-                    if let DownloadState::Done { unpacked, .. } = &dl.state {
-                        if let Some(dir) = unpacked {
-                            if ui
-                                .add_sized(Vec2::new(95.0, 26.0), egui::Button::new("Open Folder"))
-                                .clicked()
-                            {
-                                let target = dir.parent().unwrap_or(dir);
-                                let _ = open::that(target);
-                            }
-                        }
+                    if let DownloadState::Done { unpacked, .. } = &dl.state
+                        && let Some(dir) = unpacked
+                        && ui
+                            .add_sized(Vec2::new(95.0, 26.0), egui::Button::new("Open Folder"))
+                            .clicked()
+                    {
+                        let target = dir.parent().unwrap_or(dir);
+                        let _ = open::that(target);
                     }
                     ui.vertical(|ui| match title {
                         Some(t) => {

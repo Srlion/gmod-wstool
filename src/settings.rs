@@ -1,5 +1,5 @@
 use eframe::Storage;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 const KEY_DOWNLOAD_PATH: &str = "download_path";
 
@@ -14,6 +14,6 @@ pub fn load_download_path(storage: &dyn Storage) -> PathBuf {
         .unwrap_or_else(default_download_path)
 }
 
-pub fn save_download_path(storage: &mut dyn Storage, path: &PathBuf) {
+pub fn save_download_path(storage: &mut dyn Storage, path: &Path) {
     storage.set_string(KEY_DOWNLOAD_PATH, path.to_string_lossy().into_owned());
 }

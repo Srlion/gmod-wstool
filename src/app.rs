@@ -30,7 +30,7 @@ impl App {
     pub fn new(cc: &eframe::CreationContext) -> Self {
         let dest = cc
             .storage
-            .map(|s| settings::load_download_path(s))
+            .map(settings::load_download_path)
             .unwrap_or_else(settings::default_download_path);
         if let Some(s) = cc.storage {
             whitelist::seed(s.get_string(whitelist::STORAGE_KEY));
@@ -81,7 +81,7 @@ impl App {
     }
 
     fn show_loading_screen(&self, ui: &mut egui::Ui) {
-        egui::CentralPanel::default().show_inside(ui, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             ui.vertical_centered(|ui| {
                 ui.add_space(ui.available_height() / 2.0 - 30.0);
                 ui.spinner();
@@ -92,7 +92,7 @@ impl App {
     }
 
     fn show_error_screen(&mut self, ui: &mut egui::Ui, error: &str) {
-        egui::CentralPanel::default().show_inside(ui, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             ui.vertical_centered(|ui| {
                 ui.add_space(ui.available_height() / 2.0 - 50.0);
                 ui.label(
@@ -117,7 +117,7 @@ impl App {
     fn show_nav_panel(&mut self, ui: &mut egui::Ui) {
         egui::Panel::top("nav_panel")
             .min_size(NAV_HEIGHT)
-            .show_inside(ui, |ui| {
+            .show(ui, |ui| {
                 ui.add_space(6.0);
                 let bar = ui.max_rect();
                 let row_h = NAV_HEIGHT - 12.0;
@@ -242,7 +242,7 @@ impl App {
     }
 
     fn show_content_panel(&mut self, ui: &mut egui::Ui) {
-        egui::CentralPanel::default().show_inside(ui, |ui| match self.current_tab {
+        egui::CentralPanel::default().show(ui, |ui| match self.current_tab {
             Tab::MyWorkshop => self.workshop_panel.show(ui),
             Tab::Download => self.download_panel.show(ui),
         });

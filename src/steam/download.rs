@@ -86,10 +86,10 @@ impl DownloadFinishJob {
     }
 
     pub fn poll(&mut self) -> Option<&FinishResult> {
-        if self.done.is_none() {
-            if let Ok(r) = self.rx.try_recv() {
-                self.done = Some(r);
-            }
+        if self.done.is_none()
+            && let Ok(r) = self.rx.try_recv()
+        {
+            self.done = Some(r);
         }
         self.done.as_ref()
     }
@@ -102,10 +102,11 @@ pub fn start_download(id: u64) -> Result<DownloadFinishJob, String> {
     let state = ugc.item_state(item);
     let installed = state.contains(steamworks::ItemState::INSTALLED);
     let needs_update = state.contains(steamworks::ItemState::NEEDS_UPDATE);
-    if installed && !needs_update {
-        if let Some(info) = ugc.item_install_info(item) {
-            return Ok(DownloadFinishJob::already_done(PathBuf::from(info.folder)));
-        }
+    if installed
+        && !needs_update
+        && let Some(info) = ugc.item_install_info(item)
+    {
+        return Ok(DownloadFinishJob::already_done(PathBuf::from(info.folder)));
     }
 
     if ugc.download_item(item, true) {
@@ -123,10 +124,11 @@ pub enum PollResult {
 pub fn poll_progress(id: u64) -> PollResult {
     let ugc = client().ugc();
     let item = PublishedFileId(id);
-    if let Some((downloaded, total)) = ugc.item_download_info(item) {
-        if total > 0 && downloaded < total {
-            return PollResult::Downloading(DownloadState::Downloading { downloaded, total });
-        }
+    if let Some((downloaded, total)) = ugc.item_download_info(item)
+        && total > 0
+        && downloaded < total
+    {
+        return PollResult::Downloading(DownloadState::Downloading { downloaded, total });
     }
     PollResult::Pending
 }
@@ -153,7 +155,7 @@ pub fn scan_existing(dest_dir: &Path) -> Vec<u64> {
             Some((id, created))
         })
         .collect();
-    dirs.sort_by(|a, b| b.1.cmp(&a.1));
+    dirs.sort_by_key(|b| std::cmp::Reverse(b.1));
     dirs.into_iter().map(|(id, _)| id).collect()
 }
 
@@ -250,11 +252,11 @@ pub fn unpack_gma(gma_path: &Path) -> Result<PathBuf, String> {
     for entry in &entries {
         let rel = Path::new(&entry.name);
 
-        if let Some(p) = rel.parent() {
-            if !p.as_os_str().is_empty() {
-                dir.create_dir_all(p)
-                    .map_err(|e| format!("Create dir failed for {}: {e}", entry.name))?;
-            }
+        if let Some(p) = rel.parent()
+            && !p.as_os_str().is_empty()
+        {
+            dir.create_dir_all(p)
+                .map_err(|e| format!("Create dir failed for {}: {e}", entry.name))?;
         }
 
         dir.write(rel, &entry.content)
@@ -358,10 +360,10 @@ impl CollectionResolveJob {
     }
 
     pub fn poll(&mut self) -> Option<&Result<Vec<u64>, String>> {
-        if self.done.is_none() {
-            if let Ok(r) = self.rx.try_recv() {
-                self.done = Some(r);
-            }
+        if self.done.is_none()
+            && let Ok(r) = self.rx.try_recv()
+        {
+            self.done = Some(r);
         }
         self.done.as_ref()
     }
@@ -383,10 +385,10 @@ impl CopyUnpackJob {
     }
 
     pub fn poll(&mut self) -> Option<&DownloadState> {
-        if self.done.is_none() {
-            if let Ok(s) = self.rx.try_recv() {
-                self.done = Some(s);
-            }
+        if self.done.is_none()
+            && let Ok(s) = self.rx.try_recv()
+        {
+            self.done = Some(s);
         }
         self.done.as_ref()
     }
