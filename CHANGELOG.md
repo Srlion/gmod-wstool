@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.8](https://github.com/Srlion/gmod-wstool/compare/v0.2.7...v0.2.8) (2026-08-19)
+
+
+### Bug Fixes
+
+* fix clippy warnings ([fd976fe](https://github.com/Srlion/gmod-wstool/commit/fd976fe03f5a2f6014b230ccc6f509e21fbf7ea6))
+* update dependencies and improve toast notifications ([b83f632](https://github.com/Srlion/gmod-wstool/commit/b83f632cd89e5861352b7e785165653a7229d88a))
+* update steamworks dependency to version 0.13 ([75f40b8](https://github.com/Srlion/gmod-wstool/commit/75f40b8f018ceb38d6dce2dce52ecad96616d0be))
+
 ## [0.2.7](https://github.com/Srlion/gmod-wstool/compare/v0.2.6...v0.2.7) (2026-06-15)
 
 
